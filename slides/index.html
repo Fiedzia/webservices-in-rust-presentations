@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+	<title>pydown</title>
+	
+	<meta name="description" content="A jQuery library for modern HTML presentations">
+	<meta name="author" content="Caleb Troughton">
+	<meta name="viewport" content="width=1024, user-scalable=no">
+	
+	<!-- Core and extension CSS files -->
+	<link rel="stylesheet" href="css/deck.core.css">
+	<link rel="stylesheet" href="css/deck.status.css">
+	<link rel="stylesheet" href="css/deck.scale.css">
+	
+	<!-- Style theme. More available in /themes/style/ or create your own. -->
+	<link rel="stylesheet" href="css/web-2.0.css">
+	
+	<!-- Transition theme. More available in /themes/transition/ or create your own. -->
+	<link rel="stylesheet" href="css/horizontal-slide.css">
+
+	<link rel="stylesheet" href="css/md_hl.css">
+	
+	<script src="js/modernizr.custom.js"></script>
+</head>
+
+<body class="deck-container">
+
+<!-- Begin slides -->
+<section class="slide "><div class="content"><h2>How to create webservices in Rust?</h2></div></section>
+<section class="slide "><div class="content"><h2>About me</h2>
+<ul>
+<li>Search engineer at CV-Library (cv-library.co.uk)</li>
+<li>When writing web applications/services, I work mostly with python/django</li>
+<li>Recently I’ve been porting some performance-critical bits from python to rust and deploying them as webservices</li>
+</ul>
+<p>Maciej Dziardziel (fiedzia@gmail.com)</p></div></section>
+<section class="slide "><div class="content"><h2>Iron</h2>
+<ul>
+<li>Extensible, Concurrency Focused Web Development in Rust.</li>
+<li>100% safe code</li>
+<li>Most complete and popular framework for rust (3k stars, 200+ forks)</li>
+<li>for python developers: its closer to bottle or flask then django</li>
+<li>You only pay for what you use</li>
+</ul></div></section>
+<section class="slide "><div class="content"><h2>Hello world</h2>
+<div class="codehilite"><pre>    <span class="n">extern</span> <span class="n">crate</span> <span class="n">iron</span><span class="p">;</span>
+
+    <span class="k">use</span> <span class="n">iron</span><span class="o">::</span><span class="n">prelude</span><span class="o">::*</span><span class="p">;</span>
+    <span class="k">use</span> <span class="n">iron</span><span class="o">::</span><span class="n">status</span><span class="p">;</span>
+
+    <span class="k">fn</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">Iron</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="o">|</span><span class="n">_</span><span class="o">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Request</span><span class="o">|</span> <span class="p">{</span>
+
+            <span class="n">Ok</span><span class="p">(</span><span class="n">Response</span><span class="o">::</span><span class="k">with</span><span class="p">((</span><span class="n">status</span><span class="o">::</span><span class="n">Ok</span><span class="p">,</span> <span class="s">&quot;Hello world!&quot;</span><span class="p">)))</span>
+
+        <span class="p">}).</span><span class="n">http</span><span class="p">(</span><span class="s">&quot;localhost:3000&quot;</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+    <span class="p">}</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Iron provides</h2>
+<ul>
+<li>Middlewares</li>
+<li>Extensions </li>
+<li>Plugins</li>
+</ul></div></section>
+<section class="slide "><div class="content"><h2>Middleware</h2>
+<ul>
+<li>Execute code before/after your handler</li>
+<li>Middleware can modify request/response,     construct its own or return an error</li>
+</ul>
+<div class="codehilite"><pre>    <span class="k">let</span> <span class="k">mut</span> <span class="n">chain</span> <span class="o">=</span> <span class="n">Chain</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="n">router</span><span class="p">);</span>
+    <span class="n">chain</span><span class="p">.</span><span class="n">link_before</span><span class="p">(</span><span class="n">ResponseTimeMiddleware</span><span class="p">);</span>
+    <span class="n">chain</span><span class="p">.</span><span class="n">link_after</span><span class="p">(</span><span class="n">StatsdMiddleware</span><span class="p">);</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Bundled middlewares</h2>
+<ul>
+<li>Routing</li>
+<li>Mounting (like routing, but removes part of path for handler)</li>
+<li>Serving static files from given directory</li>
+<li>Logging</li>
+</ul>
+<p>Its trivial to write your own</p></div></section>
+<section class="slide "><div class="content"><h2>Routing</h2>
+<div class="codehilite"><pre>    <span class="k">let</span> <span class="k">mut</span> <span class="n">router</span> <span class="o">=</span> <span class="n">Router</span><span class="o">::</span><span class="n">new</span><span class="p">();</span>
+    <span class="n">router</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="n">handler</span><span class="p">);</span>
+    <span class="n">router</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="n">handler</span><span class="p">);</span>
+    <span class="n">router</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/:query&quot;</span><span class="p">,</span> <span class="n">handler</span><span class="p">);</span>
+    <span class="n">router</span><span class="p">.</span><span class="n">any</span><span class="p">(</span><span class="s">&quot;/page&quot;</span><span class="p">,</span> <span class="n">handler</span><span class="p">);</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Mounting</h2>
+<ul>
+<li>
+<p>Routing binds handler to url pattern.
+  Handler will see <strong>whole url</strong></p>
+</li>
+<li>
+<p>Mounting binds handler to url prefix.
+  Handler will see <strong>url without prefix</strong></p>
+</li>
+</ul></div></section>
+<section class="slide "><div class="content"><h2>Mounting</h2>
+<div class="codehilite"><pre>    <span class="k">let</span> <span class="k">mut</span> <span class="n">mount</span> <span class="o">=</span> <span class="n">Mount</span><span class="o">::</span><span class="n">new</span><span class="p">();</span>
+    <span class="n">mount</span><span class="p">.</span><span class="n">mount</span><span class="p">(</span><span class="s">&quot;/assets&quot;</span><span class="p">,</span> <span class="n">Static</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="n">Path</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;/srv/assets/&quot;</span><span class="p">)));</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Your own middleware</h2>
+<div class="codehilite"><pre>    <span class="n">pub</span> <span class="n">struct</span> <span class="n">YourMiddleware</span><span class="p">;</span>
+
+    <span class="k">impl</span> <span class="n">BeforeMiddleware</span> <span class="k">for</span> <span class="n">YourMiddleware</span> <span class="p">{</span>
+        <span class="k">fn</span> <span class="n">before</span><span class="p">(</span><span class="o">&amp;</span><span class="n">self</span><span class="p">,</span> <span class="n">request</span><span class="o">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IronResult</span><span class="o">&lt;</span><span class="p">()</span><span class="o">&gt;</span> <span class="p">{</span>
+        <span class="c1">//…your logic here</span>
+        <span class="n">Ok</span><span class="p">(())</span>
+    <span class="p">}</span>
+    <span class="k">impl</span> <span class="n">AfterMiddleware</span> <span class="k">for</span> <span class="n">YourMiddleware</span> <span class="p">{</span>
+
+    <span class="k">fn</span> <span class="n">after</span><span class="p">(</span><span class="o">&amp;</span><span class="n">self</span><span class="p">,</span> <span class="n">req</span><span class="o">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Request</span><span class="p">,</span> <span class="n">res</span><span class="o">:</span> <span class="n">Response</span><span class="p">)</span> <span class="o">-&gt;</span>     <span class="n">IronResult</span><span class="o">&lt;</span><span class="n">Response</span><span class="o">&gt;</span> <span class="p">{</span>
+        <span class="c1">//… your logic here</span>
+
+        <span class="n">Ok</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="p">}</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Extensions</h2>
+<ul>
+<li>Extensions allow to attach information to request/response</li>
+</ul>
+<p>Example: lets try to log response time</p>
+<ul>
+<li>...we need to put start time before handler is run</li>
+<li>… and get it out after</li>
+</ul></div></section>
+<section class="slide "><div class="content"><h2>Extensions - using typemap</h2>
+<div class="codehilite"><pre>    <span class="n">pub</span> <span class="n">struct</span> <span class="n">ResponseTime</span><span class="p">;</span>
+
+    <span class="k">impl</span> <span class="n">typemap</span><span class="o">::</span><span class="n">Key</span> <span class="k">for</span> <span class="n">ResponseTime</span> <span class="p">{</span>
+        <span class="k">type</span> <span class="n">Value</span> <span class="o">=</span> <span class="k">u64</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">//set</span>
+            <span class="n">request</span><span class="p">.</span><span class="n">extensions</span><span class="p">.</span><span class="n">insert</span><span class="o">::&lt;</span><span class="n">ResponseTime</span><span class="o">&gt;</span><span class="p">(</span><span class="n">precise_time_ns</span><span class="p">());</span>
+    <span class="c1">//get</span>
+            <span class="o">*</span><span class="n">request</span><span class="p">.</span><span class="n">extensions</span><span class="p">.</span><span class="n">get</span><span class="o">::&lt;</span><span class="n">ResponseTime</span><span class="o">&gt;</span><span class="p">().</span><span class="n">unwrap</span><span class="p">()</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Plugins</h2>
+<p>Plugins allow for lazily-evaluated, automatically cached extensions to Requests and Responses</p>
+<p>Iron provides plugins for:</p>
+<ul>
+<li>Cookies</li>
+<li>Sessions</li>
+<li>Parsing request params (get/post/form data/json)</li>
+</ul></div></section>
+<section class="slide "><div class="content"><h2>Using plugins</h2>
+<div class="codehilite"><pre>    <span class="k">let</span> <span class="n">get</span> <span class="o">=</span> <span class="n">match</span> <span class="n">request</span><span class="p">.</span><span class="n">get</span><span class="o">::&lt;</span><span class="n">UrlEncodedQuery</span><span class="o">&gt;</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">Ok</span><span class="p">(</span><span class="n">hashmap</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">hashmap</span><span class="p">,</span>
+        <span class="n">Err</span><span class="p">(</span><span class="n">UrlDecodingError</span><span class="o">::</span><span class="n">EmptyQuery</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">HashMap</span><span class="o">::</span><span class="n">new</span><span class="p">(),</span>
+        <span class="n">Err</span><span class="p">(</span><span class="n">_</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="n">return</span> <span class="n">Ok</span><span class="p">(</span><span class="n">Response</span><span class="o">::</span><span class="k">with</span><span class="p">((</span><span class="n">iron</span><span class="o">::</span><span class="n">status</span><span class="o">::</span><span class="n">BadRequest</span><span class="p">,</span> <span class="s">&quot;GET params decoding failed&quot;</span><span class="p">)))</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Receiving JSON</h2>
+<div class="codehilite"><pre>    <span class="k">let</span> <span class="n">json_body</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">get</span><span class="o">::&lt;</span><span class="n">bodyparser</span><span class="o">::</span><span class="n">Json</span><span class="o">&gt;</span><span class="p">();</span>
+    <span class="k">let</span> <span class="n">json_data</span> <span class="o">=</span> <span class="n">match</span> <span class="n">json_body</span> <span class="p">{</span>
+        <span class="n">Ok</span><span class="p">(</span><span class="n">Some</span><span class="p">(</span><span class="n">json_data</span><span class="p">))</span> <span class="o">=&gt;</span> <span class="n">json_data</span><span class="p">,</span>
+        <span class="n">Ok</span><span class="p">(</span><span class="n">None</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">return</span> <span class="n">Ok</span><span class="p">(</span><span class="n">Response</span><span class="o">::</span><span class="k">with</span><span class="p">((</span><span class="n">iron</span><span class="o">::</span><span class="n">status</span><span class="o">::</span><span class="n">BadRequest</span><span class="p">,</span> <span class="s">&quot;Missing json data&quot;</span><span class="p">))),</span>
+        <span class="n">Err</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="n">return</span> <span class="n">Ok</span><span class="p">(</span><span class="n">Response</span><span class="o">::</span><span class="k">with</span><span class="p">((</span><span class="n">iron</span><span class="o">::</span><span class="n">status</span><span class="o">::</span><span class="n">BadRequest</span><span class="p">,</span>
+                                      <span class="n">format</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Json parsing failed: {:?}&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">))))</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Sending JSON</h2>
+<div class="codehilite"><pre>    <span class="k">let</span> <span class="k">mut</span> <span class="n">json_result</span><span class="o">:</span> <span class="n">BTreeMap</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span> <span class="n">json</span><span class="o">::</span><span class="n">Json</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">BtreeMap</span><span class="o">::</span><span class="n">new</span><span class="p">();</span>
+    <span class="n">json_result</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&quot;status&quot;</span><span class="p">.</span><span class="n">to_string</span><span class="p">(),</span> <span class="n">json</span><span class="o">::</span><span class="n">Json</span><span class="o">::</span><span class="n">String</span><span class="p">(</span><span class="s">&quot;ok&quot;</span><span class="p">.</span><span class="n">to_string</span><span class="p">()));</span>
+    <span class="n">Ok</span><span class="p">(</span><span class="n">Response</span><span class="o">::</span><span class="k">with</span><span class="p">((</span><span class="n">iron</span><span class="o">::</span><span class="n">status</span><span class="o">::</span><span class="n">Ok</span><span class="p">,</span>     <span class="n">json</span><span class="o">::</span><span class="n">encode</span><span class="p">(</span><span class="o">&amp;</span><span class="n">json</span><span class="o">::</span><span class="n">Json</span><span class="o">::</span><span class="n">Object</span><span class="p">(</span><span class="n">json_result</span><span class="p">)).</span><span class="n">unwrap</span><span class="p">())))</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Under the hood</h2>
+<ul>
+<li>Iron</li>
+<li>Hyper</li>
+<li>Rotor</li>
+<li>MIO</li>
+<li>OS</li>
+</ul></div></section>
+<section class="slide "><div class="content"><h2>Under the hood</h2>
+<ul>
+<li>Iron</li>
+<li>Hyper (HTTP client/server)</li>
+<li>Rotor (nicer API for MIO)</li>
+<li>MIO (evented IO using epoll/kqueue)</li>
+<li>OS (epoll/kqueue)</li>
+</ul></div></section>
+<section class="slide "><div class="content"><h2>Threads</h2>
+<ul>
+<li>Up to Iron, all IO is event-based (using single thread)</li>
+<li>When Iron is initialized, we can define limit on how many threads will be used (defaults to amount of your cores)</li>
+<li>Each request will be handled in own thread</li>
+<li>Iron will manage threadpool</li>
+</ul></div></section>
+<section class="slide "><div class="content"><h2>Whar Iron <strong>doesn't</strong> provide</h2>
+<ul>
+<li>Template language</li>
+<li>ORM</li>
+<li>Database handling (just putting database pool into request.extensions worked for me well)</li>
+<li>Any support for assets (beyond serving them)</li>
+<li>Any integration with js</li>
+</ul></div></section>
+<section class="slide "><div class="content"><h2>Deployment notes</h2>
+<p>Cargo.toml:</p>
+<div class="codehilite"><pre>    <span class="k">[profile.release]</span>
+    <span class="na">debug</span> <span class="o">=</span> <span class="s">true</span>
+</pre></div>
+
+
+<p>I am using docker. Inside container there is also uwsgi:</p>
+<div class="codehilite"><pre>    <span class="k">[uwsgi]</span>
+    <span class="na">attach-daemon</span> <span class="o">=</span> <span class="s">/your_rust_app</span>
+<span class="s">    env = RUST_BACKTRACE=1</span>
+<span class="s">    logger = file:/var/log/uwsgi_error.log</span>
+</pre></div></div></section>
+<section class="slide "><div class="content"><h2>Links</h2>
+<p><a href="http://www.arewewebyet.org/">More about web for rust</a>
+<a href="http://ironframework.io/">Iron</a>
+<a href="https://github.com/iron/iron">Github page</a></p></div></section>
+<section class="slide "><div class="content"><h2>Any questions?</h2></div></section>
+
+
+<!-- deck.status snippet -->
+<p class="deck-status">
+	<span class="deck-status-current"></span>
+	/
+	<span class="deck-status-total"></span>
+</p>
+
+<!-- Grab CDN jQuery, with a protocol relative URL; fall back to local if offline -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/jquery-1.7.2.min.js"><\/script>')</script>
+
+<!-- Deck Core and extensions -->
+<script src="js/deck.core.js"></script>
+<script src="js/deck.status.js"></script>
+<script src="js/deck.scale.js"></script>
+
+<!-- Initialize the deck -->
+<script>
+$(function() {
+	$.deck('.slide');
+});
+</script>
+
+</body>
+</html>
