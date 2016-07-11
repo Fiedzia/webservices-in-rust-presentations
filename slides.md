@@ -279,9 +279,9 @@ I am using docker. Inside container there is also uwsgi:
 
 ## Links
 
-[More about web for rust](http://www.arewewebyet.org/)
-[Iron](http://ironframework.io/)
-[Github page](https://github.com/iron/iron)
+* [More about web for rust](http://www.arewewebyet.org/)
+* [Iron](http://ironframework.io/)
+* [Github page](https://github.com/iron/iron)
 
 
 
